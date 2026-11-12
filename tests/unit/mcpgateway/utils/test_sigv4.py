@@ -43,7 +43,7 @@ SUITE_TIME = datetime(2015, 8, 30, 12, 36, 0, tzinfo=timezone.utc)
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
 
 VALID_CONFIG = {
-    "access_key_id": "AKIAIOSFODNN7EXAMPLE",
+    "access_key_id": "AKIAIOSFODNN7EXAMPLE",  # pragma: allowlist secret
     "secret_access_key": SUITE_SECRET,
     "region": "us-east-1",
     "service": "execute-api",
@@ -60,7 +60,7 @@ class TestAwsSuiteVectors:
 
     def test_signing_key_vector(self):
         key = derive_signing_key(SUITE_SECRET, "20150830", "us-east-1", "iam")
-        assert key.hex() == "c4afb1cc5771d871763a393e44b703571b55cc28424d1a5e86da6ed3c154a4b9"
+        assert key.hex() == "c4afb1cc5771d871763a393e44b703571b55cc28424d1a5e86da6ed3c154a4b9"  # pragma: allowlist secret
 
     def test_get_vanilla(self):
         headers = {"host": "example.amazonaws.com", "x-amz-date": "20150830T123600Z"}
@@ -135,7 +135,7 @@ class TestSigner:
         assert signed["x-amz-date"] == "20150830T123600Z"
         assert "x-amz-security-token" not in signed
         assert re.match(
-            r"^AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20150830/us-east-1/execute-api/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=[0-9a-f]{64}$",
+            r"^AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20150830/us-east-1/execute-api/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=[0-9a-f]{64}$",  # pragma: allowlist secret
             signed["Authorization"],
         )
 
@@ -326,7 +326,7 @@ class TestFactoryWrapper:
         wrapped = with_sigv4_auth(factory, sentinel)
         assert wrapped(headers={"a": "b"}, timeout=5, auth=None) == "client"
         assert received == {"headers": {"a": "b"}, "timeout": 5, "auth": sentinel}
-        wrapped(headers=None, timeout=None, auth="caller-auth")
+        wrapped(headers=None, timeout=None, auth="caller-auth")  # pragma: allowlist secret
         assert received["auth"] is sentinel
 
 

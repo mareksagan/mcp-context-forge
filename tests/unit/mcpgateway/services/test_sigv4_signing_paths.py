@@ -28,7 +28,7 @@ from mcpgateway.transports import streamablehttp_transport as transport_module
 from mcpgateway.utils.sigv4 import SigV4Auth
 
 SECRET = "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY"  # pragma: allowlist secret
-CONFIG = {"access_key_id": "AKIAIOSFODNN7EXAMPLE", "secret_access_key": SECRET, "region": "us-east-1", "service": "execute-api"}
+CONFIG = {"access_key_id": "AKIAIOSFODNN7EXAMPLE", "secret_access_key": SECRET, "region": "us-east-1", "service": "execute-api"}  # pragma: allowlist secret
 
 
 def _stored_config() -> dict:

@@ -16,7 +16,7 @@ from mcpgateway.schemas import GatewayCreate, GatewayRead, GatewayUpdate
 from mcpgateway.services.encryption_service import get_encryption_service, protect_sigv4_config_for_storage
 
 SECRET = "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY"  # pragma: allowlist secret
-CONFIG = {"access_key_id": "AKIAIOSFODNN7EXAMPLE", "secret_access_key": SECRET, "region": "us-east-1", "service": "execute-api"}
+CONFIG = {"access_key_id": "AKIAIOSFODNN7EXAMPLE", "secret_access_key": SECRET, "region": "us-east-1", "service": "execute-api"}  # pragma: allowlist secret
 
 
 def _create(**overrides):
