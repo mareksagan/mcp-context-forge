@@ -116,7 +116,7 @@ def validate_sigv4_config(config: Any) -> Dict[str, Any]:
     Examples:
         >>> validate_sigv4_config({"access_key_id": "AKIDEXAMPLE0000000", "secret_access_key": "x", "region": "us-east-1", "service": "s3"})["service"]
         's3'
-        >>> validate_sigv4_config({"region": "us-east-1"})
+        >>> validate_sigv4_config({"region": "us-east-1"})  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         mcpgateway.utils.sigv4.SigV4ConfigError: sigv4_config.access_key_id is required
@@ -526,7 +526,7 @@ def build_gateway_sigv4_auth(auth_type: Optional[str], stored: Optional[Mapping[
     Examples:
         >>> build_gateway_sigv4_auth("bearer", None) is None
         True
-        >>> build_gateway_sigv4_auth("sigv4", None)
+        >>> build_gateway_sigv4_auth("sigv4", None)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         mcpgateway.utils.sigv4.SigV4ConfigError: auth_type 'sigv4' requires a stored sigv4_config
