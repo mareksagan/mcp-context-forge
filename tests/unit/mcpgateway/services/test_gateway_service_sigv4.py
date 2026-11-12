@@ -235,6 +235,14 @@ class TestReadMasking:
 class TestUpdateGateway:
     """update_gateway rotates credentials, evicts pinned sessions and rejects bad input."""
 
+    @pytest.fixture
+    def reg(self, monkeypatch):
+        """Install a throwaway upstream session registry and restore the singleton afterwards."""
+        registry = registry_module.UpstreamSessionRegistry()
+        monkeypatch.setattr(registry_module, "_registry", registry)
+        registry.evict_gateway = AsyncMock(return_value=0)  # type: ignore[method-assign]
+        return registry
+
     def _gateway(self, **overrides):
         gateway = MagicMock()
         gateway.id = "gw-1"
@@ -296,9 +304,8 @@ class TestUpdateGateway:
             return await service.update_gateway(db, "gw-1", update)
 
     @pytest.mark.asyncio
-    async def test_rotation_evicts_sessions_and_reencrypts(self):
-        reg = registry_module.init_upstream_session_registry()
-        reg.evict_gateway = AsyncMock(return_value=1)  # type: ignore[method-assign]
+    async def test_rotation_evicts_sessions_and_reencrypts(self, reg):
+        reg.evict_gateway.return_value = 1
         gateway = self._gateway()
         old_ciphertext = gateway.sigv4_config["secret_access_key"]
         service = self._service()
@@ -311,9 +318,7 @@ class TestUpdateGateway:
         assert get_encryption_service(settings.auth_encryption_secret).decrypt_secret(stored_secret) == ROTATED_SECRET
 
     @pytest.mark.asyncio
-    async def test_masked_echo_keeps_stored_secret(self):
-        reg = registry_module.init_upstream_session_registry()
-        reg.evict_gateway = AsyncMock(return_value=0)  # type: ignore[method-assign]
+    async def test_masked_echo_keeps_stored_secret(self, reg):
         gateway = self._gateway()
         old_ciphertext = gateway.sigv4_config["secret_access_key"]
         service = self._service()
@@ -325,9 +330,7 @@ class TestUpdateGateway:
         reg.evict_gateway.assert_awaited_once_with("gw-1")
 
     @pytest.mark.asyncio
-    async def test_switching_away_clears_signing_material(self):
-        reg = registry_module.init_upstream_session_registry()
-        reg.evict_gateway = AsyncMock(return_value=0)  # type: ignore[method-assign]
+    async def test_switching_away_clears_signing_material(self, reg):
         gateway = self._gateway()
         service = self._service()
 
@@ -338,9 +341,7 @@ class TestUpdateGateway:
         reg.evict_gateway.assert_awaited_once_with("gw-1")
 
     @pytest.mark.asyncio
-    async def test_unrelated_update_keeps_sessions(self):
-        reg = registry_module.init_upstream_session_registry()
-        reg.evict_gateway = AsyncMock(return_value=0)  # type: ignore[method-assign]
+    async def test_unrelated_update_keeps_sessions(self, reg):
         gateway = self._gateway()
         stored_before = dict(gateway.sigv4_config)
         service = self._service()
