@@ -28,7 +28,7 @@ from mcpgateway.utils.ssrf_pinning import resolve_pinned_target
 
 SECRET = "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY"  # pragma: allowlist secret
 ROTATED_SECRET = "rotatedSecretAccessKeyValue0123456789ABCD"  # pragma: allowlist secret
-CONFIG = {"access_key_id": "AKIAIOSFODNN7EXAMPLE", "secret_access_key": SECRET, "region": "us-east-1", "service": "execute-api"}
+CONFIG = {"access_key_id": "AKIAIOSFODNN7EXAMPLE", "secret_access_key": SECRET, "region": "us-east-1", "service": "execute-api"}  # pragma: allowlist secret
 
 
 def _stored(secret: str = SECRET, **extra) -> dict:
@@ -140,7 +140,7 @@ class TestConnectorsSignEveryRequest:
         with pytest.raises(Exception):  # noqa: B017 - connectors wrap the sentinel in a gateway error
             await getattr(service, method)("https://api.example.com/mcp", {}, signing_auth=signer)
 
-        client = captured["httpx_client_factory"](headers={"X-Test": "1"}, timeout=None, auth="caller-auth")
+        client = captured["httpx_client_factory"](headers={"X-Test": "1"}, timeout=None, auth="caller-auth")  # pragma: allowlist secret
         try:
             assert client.auth is signer
         finally:
@@ -181,7 +181,7 @@ class TestUniqueness:
         existing = self._existing("sigv4", _stored(ROTATED_SECRET))
         assert self._check(existing, dict(CONFIG)) is existing
 
-    @pytest.mark.parametrize("field,value", [("access_key_id", "AKIAOTHEREXAMPLE0000"), ("region", "eu-west-1"), ("service", "bedrock")])
+    @pytest.mark.parametrize("field,value", [("access_key_id", "AKIAOTHEREXAMPLE0000"), ("region", "eu-west-1"), ("service", "bedrock")])  # pragma: allowlist secret
     def test_different_identity_does_not_collide(self, field, value):
         existing = self._existing("sigv4", _stored())
         assert self._check(existing, {**CONFIG, field: value}) is None
@@ -288,7 +288,8 @@ class TestUpdateGateway:
     async def _update(self, service, db, update):
         registry_cache, lookup_cache, stats_cache, validate, invalidate, audit = self._patches()
         with registry_cache as rc, lookup_cache as lc, stats_cache as sc, validate as mv, invalidate, audit:
-            rc.return_value.invalidate_gateways = AsyncMock()
+            for name in ("invalidate_gateways", "invalidate_tools", "invalidate_resources", "invalidate_prompts"):
+                setattr(rc.return_value, name, AsyncMock())
             lc.return_value.invalidate_gateway = AsyncMock()
             sc.invalidate_tags = AsyncMock()
             mv.return_value.masked.return_value = MagicMock()

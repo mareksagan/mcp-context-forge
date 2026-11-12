@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 Add sigv4_config to gateways.
 
 Revision ID: e5a7c2d9b4f1
-Revises: e5c2a7b91f4d
+Revises: e5a1c7b9d3f2
 
 The column stores the AWS Signature V4 configuration of a gateway. The secret access
 key and the session token inside it are encrypted. NULL means the gateway does not use SigV4.
@@ -21,7 +21,7 @@ from alembic import op
 import sqlalchemy as sa
 
 revision: str = "e5a7c2d9b4f1"  # pragma: allowlist secret
-down_revision: Union[str, Sequence[str], None] = "e5c2a7b91f4d"  # pragma: allowlist secret
+down_revision: Union[str, Sequence[str], None] = "e5a1c7b9d3f2"  # pragma: allowlist secret
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
